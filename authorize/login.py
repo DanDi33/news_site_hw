@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, login_user
 
 from authorize.useful.forms import LoginForm, RegisterForm
 from models import User
@@ -8,15 +8,14 @@ from connect_db import db
 user = Blueprint('authorize', __name__, template_folder='templates', static_folder='static')
 
 
-@login_required
 @user.route("/")
+@login_required
 def index():
     return render_template("authorize/index.html", title='Авторизация')
 
 
 @user.route("/register", methods=["POST", "GET"])
 def register():
-
     form = RegisterForm()
     if form.validate_on_submit():
         if User.query.filter_by(username=form.name.data).first() is not None:
@@ -47,9 +46,11 @@ def login():
     # user_db = None
     form = LoginForm()
     if form.validate_on_submit():
+
         try:
             find_user = User.query.filter_by(username=form.name.data).first()
             if find_user and find_user.check_password(form.psw.data):
+                login_user(find_user, remember=form.remember.data)
                 print("User is found")
                 return redirect(url_for('authorize.index'))
             else:

@@ -1,7 +1,6 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from connect_db import db
-from connect_db import login
 from flask_login import UserMixin
 
 
@@ -33,8 +32,3 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"<posts {self.id}>"
-
-
-@login.user_loader
-def load_user(user_id):
-    return db.session.query(User).get(user_id)

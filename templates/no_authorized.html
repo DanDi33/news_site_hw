@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ super() }}
+<p>
+    <a href="{{url_for('authorize.login')}}">Авторизируетесь</a>
+     для доступа к закрытым страницам</p>
+{% endblock %}
