@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import current_user, login_required, login_user
-
 from authorize.useful.forms import LoginForm, RegisterForm
 from models import User
 from connect_db import db
@@ -43,10 +42,9 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('authorize.index'))
-    # user_db = None
+
     form = LoginForm()
     if form.validate_on_submit():
-
         try:
             find_user = User.query.filter_by(username=form.name.data).first()
             if find_user and find_user.check_password(form.psw.data):
@@ -58,24 +56,5 @@ def login():
         except:
             print("Ошибка чтения бд")
             flash("Ошибка чтения бд", category="error")
-
-        # if db:
-        #     try:
-        #         cur = db.cursor()
-        #         cur.execute(f'SELECT * FROM users WHERE name = "{form.name.data}" LIMIT 1')
-        #         user_db = cur.fetchall()
-        #         if not user_db:
-        #             print("Пользователь не найден. (authorize/login.py def login)")
-        #             flash("Пользователь не найден", "error")
-        #             return redirect(url_for('.login'))
-        #     except sqlite3.Error as e:
-        #         print(f'Ошибка авторизации. (authorize/login.py def login) {e}')
-        # if user_db and user_db[0]['name'] == form.name.data and check_password_hash(user_db[0]['psw'], form.psw.data):
-        #     session['id'] = user_db[0]['id']
-        #     session['name'] = user_db[0]['name']
-        #     session['psw'] = user_db[0]['psw']
-        #     print(f"Пользователь {session['name']} вошёл в аккаунт (authorize/login.py def login).")
-        #     return redirect(url_for('adminPanel.index'))
-        # flash("Неверные данные  - логин", "error")
 
     return render_template("authorize/login.html", title="Авторизация", form=form)

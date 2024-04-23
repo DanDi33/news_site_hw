@@ -12,7 +12,7 @@
             {%for field in form if field.name not in ["csrf_token","remember","submit"]%}
             <p>{{field.label(class_="form-label")}}
                 {%if field.errors%}
-                {{field(class_="form-control")}}
+                    {{field(class_="form-control")}}
                     <ul class="invalid-feedback">
                         {% for e in field.errors%}
                         <li class="form-control invalid">
@@ -24,6 +24,8 @@
                     {{field(class_="form-control")}}
                 {%endif%}
             {%endfor%}
+             <p>{{form.remember(class_="form-check-input")}}
+            {{form.remember.label(class_="form-check-label")}}</p>
             {% for cat,msg in get_flashed_messages(True) %}
                 <div class="flash {{cat}}">{{msg}}</div>
             {% endfor %}

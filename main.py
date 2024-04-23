@@ -41,7 +41,7 @@ def index():
     return render_template("index.html", title="Главная")
 
 
-@app.route('/noauthorized')
+@app.route('/no_authorized')
 def no_authorized():
     resp = make_response(render_template("no_authorized.html", title="Авторизуйтесь"))
     if request.args.get('next'):
