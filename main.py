@@ -1,5 +1,8 @@
 import flask
 from flask import Flask, render_template, make_response, request
+from flask_sqlalchemy import session
+from flask_sqlalchemy.session import Session
+
 from connect_db import db, login
 from models import User, Post
 from authorize.login import user
@@ -20,7 +23,7 @@ app.register_blueprint(user, url_prefix="/user")
 
 @login.user_loader
 def load_user(user_id):
-    return db.session.query(User).get(user_id)
+    return db.session.get(User, user_id)
 
 
 @app.before_request

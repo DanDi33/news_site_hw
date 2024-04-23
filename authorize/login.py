@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
-from flask_login import current_user, login_required, login_user
+from flask import Blueprint, render_template, flash, redirect, url_for, make_response
+from flask_login import current_user, login_required, login_user, logout_user
 from authorize.useful.forms import LoginForm, RegisterForm
 from models import User
 from connect_db import db
@@ -58,3 +58,13 @@ def login():
             flash("Ошибка чтения бд", category="error")
 
     return render_template("authorize/login.html", title="Авторизация", form=form)
+
+
+@user.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash("Вы вышли из аккаунта", "success")
+    resp = make_response(redirect(url_for("no_authorized")))
+    resp.delete_cookie('next')
+    return resp
