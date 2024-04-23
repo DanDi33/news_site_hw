@@ -1,10 +1,7 @@
 import flask
 from flask import Flask, render_template, make_response, request
-from flask_sqlalchemy import session
-from flask_sqlalchemy.session import Session
-
 from connect_db import db, login
-from models import User, Post
+from models import User
 from authorize.login import user
 
 app = Flask(__name__)
