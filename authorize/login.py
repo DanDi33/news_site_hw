@@ -16,8 +16,7 @@ def index():
 
 @user.route("/register", methods=["POST", "GET"])
 def register():
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('index'))
+
     form = RegisterForm()
     if form.validate_on_submit():
         if User.query.filter_by(username=form.name.data).first() is not None:
@@ -43,9 +42,9 @@ def register():
 
 @user.route("/login", methods=["POST", "GET"])
 def login():
-    # if isLogged():
-    #     return redirect(url_for('adminPanel.index'))
-    user_db = None
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('index'))
+    # user_db = None
     form = LoginForm()
     if form.validate_on_submit():
         try:
