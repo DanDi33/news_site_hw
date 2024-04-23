@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">News</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Моя страница</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Новости</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar (Фильтр) -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">Фильтр</div>
+    <form>
+      <div class="mb-3">
+        <select class="form-select" aria-label="Select Category">
+          <option selected>Все категории</option>
+          <option value="1">Технологии</option>
+          <option value="2">Кулинария</option>
+          <option value="3">Фильмы</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <select class="form-select" aria-label="Select Time">
+          <option selected>Все время</option>
+          <option value="1">Сегодня</option>
+          <option value="2">Последняя неделя</option>
+          <option value="3">Последний месяц</option>
+        </select>
+      </div>
+      <div class="d-grid gap-2 mb-5">
+        <button class="btn btn-primary" type="button">Применить</button>
+        <button class="btn btn-secondary" type="button">Сбросить</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- News Container -->
+  <div class="news-container">
+    <!-- News Cards -->
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <div class="card news-card">
+          <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Заголовок новости</h5>
+            <p class="card-text">Описание новости. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="card-text"><small class="text-muted">Категория: Технологии</small></p>
+          </div>
+        </div>
+
+        <div class="card news-card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Заголовок новости</h5>
+              <p class="card-text">Описание новости. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              <p class="card-text"><small class="text-muted">Категория: Технологии</small></p>
+            </div>
+          </div>
+        <!-- Add more news cards here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Button (Кнопка для показа фильтра на маленьких экранах) -->
+  <button class="btn btn-primary filter-btn" id="filterButton">Показать фильтр</button>
+
+<script src="{{ url_for('static', filename='js/myscript.js') }}"></script>
+
+{% endblock %}
