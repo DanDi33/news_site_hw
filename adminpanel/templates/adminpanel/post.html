@@ -1,0 +1,128 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block content %}
+
+{% for cat,msg in get_flashed_messages(True) %}
+    <div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+
+  <!-- Sidebar (Фильтр) -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">Фильтр</div>
+    <form>
+      <div class="mb-3">
+        <select class="form-select" aria-label="Select Category">
+          <option selected>Все категории</option>
+          <option value="1">Технологии</option>
+          <option value="2">Кулинария</option>
+          <option value="3">Фильмы</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <select class="form-select" aria-label="Select Time">
+          <option selected>Все время</option>
+          <option value="1">Сегодня</option>
+          <option value="2">Последняя неделя</option>
+          <option value="3">Последний месяц</option>
+        </select>
+      </div>
+      <div class="d-grid gap-2 mb-5">
+        <button class="btn btn-primary" type="button">Применить</button>
+        <button class="btn btn-secondary" type="button">Сбросить</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- News Container -->
+  <div class="news-container">
+    <!-- News Cards -->
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+
+        <div class="card news-card">
+          <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Заголовок новости</h5>
+            <p class="card-text">Описание новости. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="card-text d-flex"><small class="text-muted me-auto ">Категория: Технологии</small>
+              <a class="edit px-2" href="{{url_for('adminPanel.profile')}}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16">
+                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                  </svg>
+              </a>
+              <a class="edit px-2" href="{{url_for('adminPanel.profile')}}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                      <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                    </svg>
+              </a>
+              <a class="edit px-2" href="{{url_for('adminPanel.profile')}}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                  </svg>
+              </a>
+            </p>
+          </div>
+        </div>
+
+        <div class="card news-card">
+            <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Заголовок новости</h5>
+              <p class="card-text">Описание новости. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              <p class="card-text"><small class="text-muted">Категория: Технологии</small></p>
+            </div>
+          </div>
+        <!-- Add more news cards here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Button (Кнопка для показа фильтра на маленьких экранах) -->
+  <button class="btn btn-primary filter-btn" id="filterButton">Показать фильтр</button>
+
+<script src="{{ url_for('static', filename='js/myscript.js') }}"></script>
+
+<!-- Форма добавления поста -->
+<!--<form action="{{url_for('adminPanel.show_post')}}" method="post" class="form-addpost">-->
+<!--  <div class="mb-3">-->
+<!--    <label for="exampleInputSite" class="form-label">Источник</label>-->
+<!--    <input type="text" class="form-control" id="exampleInputSite" aria-describedby="emailHelp" name="name" required>-->
+<!--    <div id="emailHelp" class="form-text">Адрес сайта или источник информации.</div>-->
+<!--  </div>-->
+<!--  <div class="mb-3">-->
+<!--    <label for="exampleInputAuthor" class="form-label">Автор статьи</label>-->
+<!--    <input type="text" class="form-control" id="exampleInputAuthor" aria-describedby="emailHelp" name="author">-->
+<!--  </div>-->
+<!--  <div class="mb-3">-->
+<!--    <label for="exampleInputTitle" class="form-label">Заголовок статьи</label>-->
+<!--    <input type="text" class="form-control" id="exampleInputTitle" aria-describedby="emailHelp" name="title" required>-->
+<!--  </div>-->
+<!--  <div class="mb-3">-->
+<!--    <label for="exampleInputDescription" class="form-label">Краткое описание статьи</label>-->
+<!--    <input type="text" class="form-control" id="exampleInputDescription" aria-describedby="emailHelp" name="description" required>-->
+<!--        <div id="descriptionHelp" class="form-text">Описание для карточки новости.</div>-->
+<!--  </div>-->
+<!--  <div class="mb-3">-->
+<!--    <label for="exampleInputImage" class="form-label">Url картинки</label>-->
+<!--    <input type="text" class="form-control" id="exampleInputImage" aria-describedby="emailHelp" name="urlToImage" required>-->
+<!--        <div id="imageHelp" class="form-text">Ссылка на картинку для карточки новости.</div>-->
+<!--  </div>-->
+<!--  <div class="mb-3">-->
+<!--    <label for="exampleInputUrl" class="form-label">Url</label>-->
+<!--    <input type="text" class="form-control" id="exampleInputUrl" aria-describedby="emailHelp" name="url" required>-->
+<!--        <div id="urlHelp" class="form-text">Ссылка на используемый материал для написания статьи.</div>-->
+<!--  </div>-->
+<!--  <div class="mb-3">-->
+<!--    <label for="exampleInputText" class="form-label">Текст статьи</label>-->
+<!--&lt;!&ndash;    <input type="email" class="form-control" id="exampleInputText" aria-describedby="emailHelp">&ndash;&gt;-->
+<!--    <textarea class="form-control" id="exampleInputText" aria-describedby="emailHelp" name="post" rows="7" cols="40" required></textarea>-->
+<!--        <div id="textHelp" class="form-text">Полный текст статьи. Допускается HTML разметка.</div>-->
+<!--  </div>-->
+<!--  <div class="d-grid gap-2 d-md-flex justify-content-md-end">-->
+<!--     <button type="submit" class="btn btn-primary ">Добавить</button>-->
+<!--  </div>-->
+
+<!--</form>-->
+{% endblock %}

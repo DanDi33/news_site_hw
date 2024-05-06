@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, make_response
+from flask import Blueprint, render_template, flash, redirect, url_for, make_response, request
 from flask_login import current_user, login_required, login_user, logout_user
 from authorize.useful.forms import LoginForm, RegisterForm
 from models import User
@@ -7,10 +7,10 @@ from connect_db import db
 user = Blueprint('authorize', __name__, template_folder='templates', static_folder='static')
 
 
-@user.route("/")
-@login_required
-def index():
-    return render_template("authorize/index.html", title='Авторизация')
+# @user.route("/")
+# @login_required
+# def index():
+#     return render_template("authorize/del-profile.html", title='Авторизация')
 
 
 @user.route("/register", methods=["POST", "GET"])
@@ -41,7 +41,7 @@ def register():
 @user.route("/login", methods=["POST", "GET"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('authorize.index'))
+        return redirect(url_for('adminPanel.profile'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -50,7 +50,7 @@ def login():
             if find_user and find_user.check_password(form.psw.data):
                 login_user(find_user, remember=form.remember.data)
                 print("User is found")
-                return redirect(url_for('authorize.index'))
+                return redirect(request.cookies.get("next") or url_for('adminPanel.profile'))
             else:
                 flash("Неверная пара логин/пароль", category="error")
         except:
@@ -64,7 +64,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("Вы вышли из аккаунта", "success")
-    resp = make_response(redirect(url_for("no_authorized")))
+    resp = make_response(redirect(url_for("index")))
     resp.delete_cookie('next')
+    flash("Вы вышли из аккаунта", "success")
     return resp

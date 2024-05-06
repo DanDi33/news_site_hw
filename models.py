@@ -10,6 +10,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(50), unique=True)
     psw = db.Column(db.String(500), nullable=False)
     date = db.Column(db.DateTime, default=datetime.now())
+    posts = db.relationship('Post', backref='user', cascade='all, delete')
 
     def __repr__(self):
         return f"<users {self.id}>"
@@ -21,6 +22,15 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.psw, password)
 
 
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    posts = db.relationship('Post', backref='category', cascade='all, delete')
+
+    def __repr__(self):
+        return f"<categories {self.id}>"
+
+
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
@@ -29,6 +39,7 @@ class Post(db.Model):
     date = db.Column(db.DateTime, default=datetime.now())
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
     def __repr__(self):
         return f"<posts {self.id}>"
