@@ -207,10 +207,11 @@ def show_post():
 @login_required
 def add_post():
     if request.method == "POST":
-        form = AddPostForm()
+        form = AddPostForm(request.form)
+        add_category_choices(form)
         print(f"Privet {form.validate_on_submit()}")
         if form.validate_on_submit():
-            print(form.category.choices)
+            print(form)
         print(form.title.data)
         print(form.category.data)
         print(form.description.data)
@@ -220,5 +221,5 @@ def add_post():
 
 
 def add_category_choices(form):
-    form.category.choices = [(None, "Выберите категорию")]
+    form.category.choices = [(0, "Выберите категорию")]
     form.category.choices += ([(option.id, option.name) for option in Category.query.all()])

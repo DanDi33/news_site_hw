@@ -51,13 +51,12 @@ class AddPostForm(FlaskForm):
                         validators=[Length(min=2, max=200, message="Имя должно содержать от 2 до 200 символов"),
                                     DataRequired()],
                         description="Введите заголовок")
-    category = SelectField("Категория",
-                           choices=[], default=None)
+    category = SelectField("Категория")
     image = FileField('Картинка новости', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')],
                       description="Выберете файл")
     description = TextAreaField("Краткое описание новости",
                                 validators=[
-                                    Length(min=2, max=300, message="Имя должно содержать от 2 до 200 символов"),
+                                    Length(min=2, max=300, message="Имя должно содержать от 2 до 300 символов"),
                                     DataRequired()],
                                 description="Краткое описание новости")
     text = TextAreaField("Текст новости", validators=[Length(min=10, max=2500, message="Поле 'текст' должно содержать "

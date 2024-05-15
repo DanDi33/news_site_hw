@@ -33,9 +33,9 @@ class Category(db.Model):
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
     filename = db.Column(db.String(50))
-    desc = db.Column(db.String(250), nullable=False)
+    desc = db.Column(db.String(300), nullable=False)
     post = db.Column(db.String(2500), nullable=False)
     date = db.Column(db.DateTime, default=datetime.now())
 
