@@ -1,9 +1,16 @@
+import os
+
+import flask
 from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
 from flask_login import login_required, current_user, logout_user
 from werkzeug.utils import secure_filename
 
-from adminpanel.useful.forms import EditUsernameForm, EditEmailForm, EditPasswordForm, EditCategoryForm, \
-    DeleteCategoryForm, AddPostForm
+from adminpanel.useful.forms import (EditUsernameForm,
+                                     EditEmailForm,
+                                     EditPasswordForm,
+                                     EditCategoryForm,
+                                     DeleteCategoryForm,
+                                     AddPostForm)
 from connect_db import db
 from models import User, Category, Post
 
@@ -208,39 +215,45 @@ def show_post():
 @login_required
 def add_post():
     if request.method == "POST":
-        form = AddPostForm(request.form)
+        form = AddPostForm()
         add_category_choices(form)
         print(f"Privet {form.validate_on_submit()}")
         if form.validate_on_submit():
-            if form.image.data:
-                image = form.image.data
-
-                # Создаю имя файла вида: "логин" + ".расширение исходного файла"
-                last_part = image.filename.split('.')[-1]
-                # filename = secure_filename(f"{profile['user_name']}.{last_part}"
             try:
                 add_post_to_db = Post(title=form.title.data,
                                       category_id=form.category.data,
-                                      # filename=form.image.name,
+                                      # filename=form.image.data,
                                       desc=form.description.data,
                                       post=form.text.data,
                                       user_id=current_user.id
                                       )
-                print(add_post_to_db)
+
                 db.session.add(add_post_to_db)
                 db.session.commit()
-                # print(f"id post {db.session.refresh(add_post_to_db)}")
+                print(f"id post {add_post_to_db.id}")
                 flash("Пост успешно добавлен", "success")
+                print(f"image {form.image.data}")
+                if form.image.data:
+                    image = form.image.data
+
+                    # Создаю имя файла вида: "image_p"+"post.id" + ".расширение исходного файла"
+                    last_part = image.filename.split('.')[-1]
+                    filename = secure_filename(f"image_p{add_post_to_db.id}.{last_part}")
+
+                    # Создаю директорию "uploads", если ее нет
+                    os.makedirs(flask.current_app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+                    # Сохраняю файл с новым именем в директории "uploads"
+                    image.save(os.path.join(flask.current_app.config['UPLOAD_FOLDER'], filename))
+
+                    add_post_to_db.filename = filename
+                    db.session.add(add_post_to_db)
+                    db.session.commit()
             except:
                 db.session.rollback()
                 print("Ошибка добавления в бд")
                 flash("Ошибка добавления в бд", category="error")
-            print(form)
-        print(form.title.data)
-        print(form.category.data)
-        print(form.description.data)
-        print(form.image.data)
-        print(form.text.data)
+
     return redirect(url_for('adminPanel.show_post'))
 
 
