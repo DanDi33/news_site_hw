@@ -25,7 +25,11 @@
         <ul class="navbar-nav">
           {%for elem in menu%}
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for(elem.url)}}">{{elem.name}}</a>
+              {% if elem.name == 'Добавить пост'%}
+                <a class="btn btn-primary" href="{{url_for(elem.url)}}" data-bs-toggle="modal" id="link_add_post" data-bs-target="#AddPostModal">{{elem.name}}</a>
+              {% else %}
+                <a class="nav-link" href="{{url_for(elem.url)}}">{{elem.name}}</a>
+              {% endif %}
           </li>
           {%endfor%}
 
@@ -36,6 +40,70 @@
       </div>
     </div>
   </nav>
+
+<!--Модальное окно Добавление поста-->
+  <div class="modal fade" id="AddPostModal" tabindex="-1" aria-labelledby="ModalLabelAddPost"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalLabelAddPost">Добавить пост</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{url_for('adminPanel.add_post')}}" method="post">
+              {{form.hidden_tag()}}
+               <p>{{form.title.label(class_="form-label")}}
+                {%if form.title.errors%}
+                    {{form.title(class_="form-control")}}
+                    <ul class="invalid-feedback">
+                        {% for e in form.title.errors%}
+                        <li class="form-control invalid">
+                            <p>{{e}}
+                        </li>
+                        {%endfor%}
+                    </ul>
+                {% else%}
+                    {{form.title(class_="form-control", placeholder=form.title.description)}}
+                {%endif%}
+
+              <p>{{form.category.label(class_="form-label")}}
+                {%if form.category.errors%}
+                    {{form.category(class_="form-control")}}
+                    <ul class="invalid-feedback">
+                        {% for e in form.category.errors%}
+                        <li class="form-control invalid">
+                            <p>{{e}}
+                        </li>
+                        {%endfor%}
+                    </ul>
+                {% else%}
+                    {{form.category(class_="form-control")}}
+                {%endif%}
+
+              <p>{{form.text.label(class_="form-label")}}
+                {%if form.text.errors%}
+                    {{form.text(class_="form-control")}}
+                    <ul class="invalid-feedback">
+                        {% for e in form.text.errors%}
+                        <li class="form-control invalid">
+                            <p>{{e}}
+                        </li>
+                        {%endfor%}
+                    </ul>
+                {% else%}
+                    {{form.text(class_="form-control",rows=7)}}
+                {%endif%}
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+              {{form.submit(class_="btn btn-primary profile-button")}}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
 {% block content %}
 {% endblock %}

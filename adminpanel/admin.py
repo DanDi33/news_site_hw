@@ -2,15 +2,15 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user, logout_user
 
 from adminpanel.useful.forms import EditUsernameForm, EditEmailForm, EditPasswordForm, EditCategoryForm, \
-    DeleteCategoryForm
+    DeleteCategoryForm, AddPostForm
 from connect_db import db
 from models import User, Category, Post
 
 admin = Blueprint('adminPanel', __name__, template_folder='templates', static_folder='static')
 
 menu = [
+    {"name": "Добавить пост", "url": "adminPanel.show_post"},
     {"name": "Категории", "url": "adminPanel.category"},
-    {"name": "Добавить пост", "url": "index"},
     {"name": "Посты", "url": "adminPanel.show_post"},
     {"name": "Профиль", "url": "adminPanel.profile"},
 ]
@@ -20,11 +20,12 @@ menu = [
 @admin.route("/profile")
 @login_required
 def profile():
+    form = AddPostForm()
     form_u = EditUsernameForm()
     form_e = EditEmailForm()
     form_p = EditPasswordForm()
     return render_template("adminPanel/profile.html",
-                           menu=menu, form_u=form_u, form_e=form_e, form_p=form_p, title='Авторизация')
+                           menu=menu, form=form, form_u=form_u, form_e=form_e, form_p=form_p, title='Авторизация')
 
 
 @admin.route("/edit_user", methods=["GET", "POST"])
@@ -108,21 +109,16 @@ def delete_profile():
     return redirect(url_for('adminPanel.profile'))
 
 
-@admin.route("/show_post")
-@login_required
-def show_post():
-    return render_template("adminPanel/post.html", menu=menu, title='Добавление поста')
-
-
 @admin.route("/category")
 @login_required
 def category():
+    form = AddPostForm()
     form_a = EditCategoryForm()
     form_e = EditCategoryForm()
     form_d = DeleteCategoryForm()
     categories = Category.query.all()
     print(categories)
-    return render_template("adminPanel/category.html", menu=menu, form_a=form_a,
+    return render_template("adminPanel/category.html", menu=menu, form=form, form_a=form_a,
                            form_e=form_e, form_d=form_d, categories=categories, title='Категории')
 
 
@@ -195,3 +191,25 @@ def delete_category(alias):
 
     return redirect(url_for('adminPanel.category'))
 
+
+@admin.route("/show_post")
+@login_required
+def show_post():
+    form = AddPostForm()
+    # choices = [(None, "Выберите категорию")]
+    # choices += ([(option.id, option.name) for option in Category.query.all()])
+    # print(choices)
+    form.category.choices = [(None, "Выберите категорию")]
+    form.category.choices += ([(option.id, option.name) for option in Category.query.all()])
+    return render_template("adminPanel/post.html", menu=menu, form=form, title='Добавление поста')
+
+
+@admin.route("/add_post", methods=["GET", "POST"])
+@login_required
+def add_post():
+    form = AddPostForm()
+    if form.validate_on_submit():
+        # form.category.choices = [(None, "Выберите категорию")]
+        # form.category.choices.append([(option.id, option.name) for option in Category.query.all()])
+        print(form.category.choices)
+    return redirect(url_for('adminPanel.show_post'))
