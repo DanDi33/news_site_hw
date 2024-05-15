@@ -51,55 +51,36 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
         </div>
         <div class="modal-body">
-          <form action="{{url_for('adminPanel.add_post')}}" method="post">
-              {{form.hidden_tag()}}
-               <p>{{form.title.label(class_="form-label")}}
-                {%if form.title.errors%}
-                    {{form.title(class_="form-control")}}
-                    <ul class="invalid-feedback">
-                        {% for e in form.title.errors%}
-                        <li class="form-control invalid">
-                            <p>{{e}}
-                        </li>
-                        {%endfor%}
-                    </ul>
-                {% else%}
-                    {{form.title(class_="form-control", placeholder=form.title.description)}}
-                {%endif%}
+                  <form action="{{url_for('adminPanel.add_post')}}" method="post" enctype="multipart/form-data">
+                      {{form.hidden_tag()}}
+                            {% for field in form if field.name not in ['submit', 'csrf_token']%}
 
-              <p>{{form.category.label(class_="form-label")}}
-                {%if form.category.errors%}
-                    {{form.category(class_="form-control")}}
-                    <ul class="invalid-feedback">
-                        {% for e in form.category.errors%}
-                        <li class="form-control invalid">
-                            <p>{{e}}
-                        </li>
-                        {%endfor%}
-                    </ul>
-                {% else%}
-                    {{form.category(class_="form-control")}}
-                {%endif%}
+                           <p>{{field.label(class_="form-label")}}
+                            {%if field.errors%}
+                                {{field(class_="form-control")}}
+                                <ul class="invalid-feedback">
+                                    {% for e in field.errors%}
+                                    <li class="form-control invalid">
+                                        <p>{{e}}
+                                    </li>
+                                    {%endfor%}
+                                </ul>
+                            {% else%}
+                                {% if field.name == 'description'%}
+                                    {{field(class_="form-control", placeholder=field.description, rows=3)}}
+                                {% elif field.name == 'text'%}
+                                    {{field(class_="form-control", placeholder=field.description, rows=10)}}
+                                {%else%}
+                                    {{field(class_="form-control", placeholder=field.description)}}
+                                {%endif%}
+                            {%endif%}
+                      {% endfor %}
 
-              <p>{{form.text.label(class_="form-label")}}
-                {%if form.text.errors%}
-                    {{form.text(class_="form-control")}}
-                    <ul class="invalid-feedback">
-                        {% for e in form.text.errors%}
-                        <li class="form-control invalid">
-                            <p>{{e}}
-                        </li>
-                        {%endfor%}
-                    </ul>
-                {% else%}
-                    {{form.text(class_="form-control",rows=7)}}
-                {%endif%}
-
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-              {{form.submit(class_="btn btn-primary profile-button")}}
-            </div>
-          </form>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                      {{form.submit(class_="btn btn-primary profile-button")}}
+                    </div>
+                  </form>
         </div>
       </div>
     </div>

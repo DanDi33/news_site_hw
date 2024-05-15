@@ -1,18 +1,15 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed
 from wtforms.fields.choices import SelectField
-from wtforms.fields.simple import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms.fields.simple import StringField, PasswordField, SubmitField, TextAreaField, FileField
 from wtforms.validators import Length, Regexp, Email, DataRequired, EqualTo, ValidationError
-
-import models
-from connect_db import db
-from models import User, Category
 
 
 class EditUsernameForm(FlaskForm):
     name = StringField("Логин", validators=[Length(min=4, max=25, message="Имя должно содержать от 4 до 25 символов"),
                                             Regexp("^[A-Za-z0-9@#$%^&+=]{3,26}$",
-                                                   message="Для имени пользователя разрешены "
-                                                           "только латинские буквы, цифры и спецсимволы(без пробелов)."),
+                                                   message="Для имени пользователя разрешены только латинские буквы, "
+                                                           "цифры и спецсимволы(без пробелов)."),
                                             ])
     submit = SubmitField("Сохранить изменения")
 
@@ -44,23 +41,28 @@ class EditPasswordForm(FlaskForm):
     submit = SubmitField("Сохранить изменения")
 
 
-def validate_category(field):
-    if field.data is None:
-        raise ValidationError("We're sorry, you must be 13 or older to register")
+# def validate_category(field):
+#     if field.data is None:
+#         raise ValidationError("Необходимо выбрать категорию")
 
 
 class AddPostForm(FlaskForm):
     title = StringField("Заголовок",
-                        validators=[Length(min=2, max=200, message="Имя должно содержать от 2 до 200 символов"), ],
+                        validators=[Length(min=2, max=200, message="Имя должно содержать от 2 до 200 символов"),
+                                    DataRequired()],
                         description="Введите заголовок")
-    description = StringField("Краткое описание новости",
-                              validators=[
-                                  Length(min=2, max=300, message="Имя должно содержать от 2 до 200 символов"), ],
-                              description="Краткое описание новости")
     category = SelectField("Категория",
                            choices=[], default=None)
-    text = TextAreaField("Текст новости", validators=[Length(min=10, max=200, message="Поле 'текст' должно содержать "
-                                                                                      "от 10 символов")],
+    image = FileField('Картинка новости', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')],
+                      description="Выберете файл")
+    description = TextAreaField("Краткое описание новости",
+                                validators=[
+                                    Length(min=2, max=300, message="Имя должно содержать от 2 до 200 символов"),
+                                    DataRequired()],
+                                description="Краткое описание новости")
+    text = TextAreaField("Текст новости", validators=[Length(min=10, max=2500, message="Поле 'текст' должно содержать "
+                                                                                       "от 10 символов"),
+                                                      DataRequired()],
                          description="Введите текст новости")
     submit = SubmitField("Добавить пост")
 

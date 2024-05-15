@@ -35,7 +35,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
     filename = db.Column(db.String(50))
-    post = db.Column(db.String(500), nullable=False)
+    desc = db.Column(db.String(250), nullable=False)
+    post = db.Column(db.String(2500), nullable=False)
     date = db.Column(db.DateTime, default=datetime.now())
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

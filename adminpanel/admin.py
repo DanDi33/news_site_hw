@@ -21,6 +21,7 @@ menu = [
 @login_required
 def profile():
     form = AddPostForm()
+    add_category_choices(form)
     form_u = EditUsernameForm()
     form_e = EditEmailForm()
     form_p = EditPasswordForm()
@@ -113,11 +114,12 @@ def delete_profile():
 @login_required
 def category():
     form = AddPostForm()
+    add_category_choices(form)
     form_a = EditCategoryForm()
     form_e = EditCategoryForm()
     form_d = DeleteCategoryForm()
     categories = Category.query.all()
-    print(categories)
+    # print(categories)
     return render_template("adminPanel/category.html", menu=menu, form=form, form_a=form_a,
                            form_e=form_e, form_d=form_d, categories=categories, title='Категории')
 
@@ -196,20 +198,27 @@ def delete_category(alias):
 @login_required
 def show_post():
     form = AddPostForm()
-    # choices = [(None, "Выберите категорию")]
-    # choices += ([(option.id, option.name) for option in Category.query.all()])
-    # print(choices)
-    form.category.choices = [(None, "Выберите категорию")]
-    form.category.choices += ([(option.id, option.name) for option in Category.query.all()])
+    add_category_choices(form)
+
     return render_template("adminPanel/post.html", menu=menu, form=form, title='Добавление поста')
 
 
 @admin.route("/add_post", methods=["GET", "POST"])
 @login_required
 def add_post():
-    form = AddPostForm()
-    if form.validate_on_submit():
-        # form.category.choices = [(None, "Выберите категорию")]
-        # form.category.choices.append([(option.id, option.name) for option in Category.query.all()])
-        print(form.category.choices)
+    if request.method == "POST":
+        form = AddPostForm()
+        print(f"Privet {form.validate_on_submit()}")
+        if form.validate_on_submit():
+            print(form.category.choices)
+        print(form.title.data)
+        print(form.category.data)
+        print(form.description.data)
+        print(form.image.data)
+        print(form.text.data)
     return redirect(url_for('adminPanel.show_post'))
+
+
+def add_category_choices(form):
+    form.category.choices = [(None, "Выберите категорию")]
+    form.category.choices += ([(option.id, option.name) for option in Category.query.all()])
