@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
 from flask_login import login_required, current_user, logout_user
+from werkzeug.utils import secure_filename
 
 from adminpanel.useful.forms import EditUsernameForm, EditEmailForm, EditPasswordForm, EditCategoryForm, \
     DeleteCategoryForm, AddPostForm
@@ -211,6 +212,29 @@ def add_post():
         add_category_choices(form)
         print(f"Privet {form.validate_on_submit()}")
         if form.validate_on_submit():
+            if form.image.data:
+                image = form.image.data
+
+                # Создаю имя файла вида: "логин" + ".расширение исходного файла"
+                last_part = image.filename.split('.')[-1]
+                # filename = secure_filename(f"{profile['user_name']}.{last_part}"
+            try:
+                add_post_to_db = Post(title=form.title.data,
+                                      category_id=form.category.data,
+                                      # filename=form.image.name,
+                                      desc=form.description.data,
+                                      post=form.text.data,
+                                      user_id=current_user.id
+                                      )
+                print(add_post_to_db)
+                db.session.add(add_post_to_db)
+                db.session.commit()
+                # print(f"id post {db.session.refresh(add_post_to_db)}")
+                flash("Пост успешно добавлен", "success")
+            except:
+                db.session.rollback()
+                print("Ошибка добавления в бд")
+                flash("Ошибка добавления в бд", category="error")
             print(form)
         print(form.title.data)
         print(form.category.data)

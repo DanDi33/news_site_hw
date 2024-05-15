@@ -3,7 +3,7 @@
 {% block content %}
 
 {% for cat,msg in get_flashed_messages(True) %}
-    <div class="flash {{cat}}">{{msg}}</div>
+    <div class="flash {{cat}} news-container">{{msg}}</div>
 {% endfor %}
 
   <!-- Sidebar (Фильтр) -->

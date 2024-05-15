@@ -8,6 +8,7 @@ from adminpanel.admin import admin
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///news_site.db'
 app.config["SECRET_KEY"] = "wewrtrtey1223345dfgdf"
+app.config['UPLOAD_FOLDER'] = 'uploads'
 
 db.init_app(app)
 login.init_app(app)
@@ -25,9 +26,9 @@ def load_user(user_id):
     return db.session.get(User, user_id)
 
 
-# @app.before_request
-# def before_request():
-#     db.create_all()
+@app.before_request
+def before_request():
+    db.create_all()
 
 
 @app.route("/")
