@@ -26,9 +26,9 @@ def load_user(user_id):
     return db.session.get(User, user_id)
 
 
-@app.before_request
-def before_request():
-    db.create_all()
+# @app.before_request
+# def before_request():
+#     db.create_all()
 
 
 @app.route("/")
