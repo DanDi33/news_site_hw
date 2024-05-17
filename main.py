@@ -1,7 +1,11 @@
+import locale
+
 import flask
-from flask import Flask, render_template, make_response, request
+from flask import Flask, render_template, make_response, request, send_from_directory
+from flask_login import current_user
+
 from connect_db import db, login
-from models import User
+from models import User, Category, Post
 from authorize.login import user
 from adminpanel.admin import admin
 
@@ -16,6 +20,8 @@ login.init_app(app)
 login.login_view = 'no_authorized'
 login.login_message = 'Авторизируетесь для доступа к закрытым страницам'
 login.login_message_category = 'success'
+
+locale.setlocale(locale.LC_ALL, 'ru_RU')
 
 app.register_blueprint(user, url_prefix="/user")
 app.register_blueprint(admin, url_prefix="/admin")
@@ -41,7 +47,13 @@ def index():
     # user1.query.all()
     # print(f"posts = {post}")
     # print(f"users = {user1}")
-    return render_template("index.html", title="Главная")
+    posts = Post.query.join(Category).join(User).add_columns(User.username,
+                                                             Post.title,
+                                                             Post.desc,
+                                                             Post.filename,
+                                                             Post.date,
+                                                             Category.name)
+    return render_template("index.html", posts=posts, title="Главная")
 
 
 @app.route('/no_authorized')
@@ -50,6 +62,18 @@ def no_authorized():
     if request.args.get('next'):
         resp.set_cookie('next', request.args.get('next'))
     return resp
+
+
+@app.route('/uploads/<filename>')
+def send_file(filename):
+    return send_from_directory(flask.current_app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.template_filter('formatdatetime')
+def format_datetime(value, format='%B %d, %Y %H:%M'):
+    if value is None:
+        return ""
+    return value.strftime(format)
 
 
 if __name__ == "__main__":

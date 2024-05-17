@@ -48,7 +48,7 @@ class EditPasswordForm(FlaskForm):
 
 class AddPostForm(FlaskForm):
     title = StringField("Заголовок",
-                        validators=[Length(min=2, max=200, message="Имя должно содержать от 2 до 200 символов"),
+                        validators=[Length(min=2, max=300, message="Имя должно содержать от 2 до 300 символов"),
                                     DataRequired()],
                         description="Введите заголовок")
     category = SelectField("Категория")
@@ -56,11 +56,11 @@ class AddPostForm(FlaskForm):
                       description="Выберете файл")
     description = TextAreaField("Краткое описание новости",
                                 validators=[
-                                    Length(min=2, max=300, message="Имя должно содержать от 2 до 300 символов"),
+                                    Length(min=2, max=500, message="Имя должно содержать от 2 до 500 символов"),
                                     DataRequired()],
                                 description="Краткое описание новости")
-    text = TextAreaField("Текст новости", validators=[Length(min=10, max=2500, message="Поле 'текст' должно содержать "
-                                                                                       "от 10 символов"),
+    text = TextAreaField("Текст новости", validators=[Length(min=10, max=10000, message="Поле 'текст' должно содержать "
+                                                                                        "от 10 символов"),
                                                       DataRequired()],
                          description="Введите текст новости")
     submit = SubmitField("Добавить пост")

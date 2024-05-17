@@ -2,9 +2,6 @@
 
 {% block content %}
 
-{% for cat,msg in get_flashed_messages(True) %}
-    <div class="flash {{cat}} news-container">{{msg}}</div>
-{% endfor %}
 
   <!-- Sidebar (Фильтр) -->
   <div class="sidebar" id="sidebar">
@@ -35,16 +32,26 @@
 
   <!-- News Container -->
   <div class="news-container">
+    {% if not open_modal_add_post %}
+      {% for cat,msg in get_flashed_messages(True) %}
+      <div class="flash {{cat}}">{{msg}}</div>
+      {% endfor %}
+    {% endif%}
+
     <!-- News Cards -->
     <div class="row justify-content-center">
       <div class="col-md-10">
-
+        {% for post in posts %}
         <div class="card news-card">
-          <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+          {% if post.filename%}
+            <img src="{{url_for('adminPanel.send_file', filename=post.filename)}}" class="card-img-top" alt="...">
+          {% else %}
+            <img src="{{url_for('static', filename='/img/default_news.jpg')}}" class="card-img-top" alt="...">
+          {% endif %}
           <div class="card-body">
-            <h5 class="card-title">Заголовок новости</h5>
-            <p class="card-text">Описание новости. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-            <p class="card-text d-flex"><small class="text-muted me-auto ">Категория: Технологии</small>
+            <h5 class="card-title">{{post.title}}</h5>
+            <p class="card-text">{{post.desc}}</p>
+            <p class="card-text d-flex"><small class="text-muted me-auto ">Категория: {{post.name}}</small>
               <a class="edit px-2" href="{{url_for('adminPanel.profile')}}" data-bs-toggle="modal" id="link_add_post" data-bs-target="#AddPostModal">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16">
                     <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
@@ -65,16 +72,7 @@
             </p>
           </div>
         </div>
-
-        <div class="card news-card">
-            <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
-            <div class="card-body">
-              <h5 class="card-title">Заголовок новости</h5>
-              <p class="card-text">Описание новости. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              <p class="card-text"><small class="text-muted">Категория: Технологии</small></p>
-            </div>
-          </div>
-        <!-- Add more news cards here -->
+        {% endfor %}
       </div>
     </div>
   </div>

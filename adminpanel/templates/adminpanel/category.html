@@ -103,12 +103,13 @@
                     </div>
                   </div>
                 {%endfor%}
-
+                {% if not open_modal_add_cat %}
                 {% for cat,msg in get_flashed_messages(True) %}
                     <div class="flash {{cat}}">{{msg}}</div>
                 {% endfor %}
+                {% endif %}
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="button" class="btn btn-primary profile-button" data-bs-toggle="modal" data-bs-target="#AddModal">Добавить категорию</button>
+                <button type="button" class="btn btn-primary profile-button" data-bs-toggle="modal" data-bs-target="#AddModal" id="btn_add_cat">Добавить категорию</button>
                 </div>
             </div>
         </div>
@@ -124,6 +125,13 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
         </div>
         <div class="modal-body">
+
+            {% if open_modal_add_cat %}
+            {% for cat,msg in get_flashed_messages(True) %}
+              <div class="flash {{cat}}">{{msg}}</div>
+              {% endfor %}
+
+            {% endif%}
           <form action="{{url_for('adminPanel.add_category')}}" method="post">
               {{form_a.hidden_tag()}}
                <p>
@@ -151,6 +159,12 @@
   </div>
 
 
-
+<!--Открываю модального окно если open_modal_add_cat - True-->
+{% if open_modal_add_cat %}
+    <script>
+         document.addEventListener("DOMContentLoaded", () => {
+        document.querySelector('#btn_add_cat').click();})
+    </script>
+{% endif%}
 
 {% endblock %}
