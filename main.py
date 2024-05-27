@@ -39,14 +39,6 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
-    print(flask.session)
-    print(flask.session.get('next'))
-    # post = Post()
-    # user1 = User()
-    # post.query.all()
-    # user1.query.all()
-    # print(f"posts = {post}")
-    # print(f"users = {user1}")
     posts = Post.query.join(Category).join(User).add_columns(User.username,
                                                              Post.title,
                                                              Post.desc,
@@ -54,6 +46,18 @@ def index():
                                                              Post.date,
                                                              Category.name)
     return render_template("index.html", posts=posts, title="Главная")
+
+
+@app.route("/show_post/<alias>", methods=["GET", "POST"])
+def show_post(alias):
+    post = Post.query.filter_by(id=alias).join(Category).join(User).add_columns(User.username,
+                                                                                Post.title,
+
+                                                                                Post.post,
+                                                                                Post.date,
+                                                                                Category.name)
+    print(f"post - {post}")
+    return render_template('show_post.html', post=post, title="Пост")
 
 
 @app.route('/no_authorized')
