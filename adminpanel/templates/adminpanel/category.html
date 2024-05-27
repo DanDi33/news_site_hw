@@ -42,23 +42,23 @@
                         </div>
                         <div class="modal-body">
                           <form action="{{url_for('adminPanel.edit_category',alias=category.id)}}" method="post">
-                              {{form_e.hidden_tag()}}
+                              {{forms.category.edit.hidden_tag()}}
                               <p>
-                                {%if form_e.name.errors%}
-                                    {{form_e.name(class_="form-control")}}
+                                {%if forms.category.edit.name.errors%}
+                                    {{forms.category.edit.name(class_="form-control")}}
                                     <ul class="invalid-feedback">
-                                        {% for e in form_e.name.errors%}
+                                        {% for e in forms.category.edit.name.errors%}
                                         <li class="form-control invalid">
                                             <p>{{e}}
                                         </li>
                                         {%endfor%}
                                     </ul>
                                 {% else%}
-                                    {{form_e.name(class_="form-control", value=category.name)}}
+                                    {{forms.category.edit.name(class_="form-control", value=category.name)}}
                                 {%endif%}
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                              {{form_e.submit(class_="btn btn-primary profile-button")}}
+                              {{forms.category.edit.submit(class_="btn btn-primary profile-button")}}
                             </div>
                           </form>
                         </div>
@@ -78,24 +78,24 @@
                         </div>
                         <div class="modal-body">
                           <form action="{{url_for('adminPanel.delete_category',alias=category.id)}}" method="post">
-                              {{form_d.hidden_tag()}}
-                              <p>{{form_d.name.label(class_="form-label")}}
-                                {%if form_d.name.errors%}
-                                    {{form_d.name(class_="form-control")}}
+                              {{forms.category.delete.hidden_tag()}}
+                              <p>{{forms.category.delete.name.label(class_="form-label")}}
+                                {%if forms.category.delete.name.errors%}
+                                    {{forms.category.delete.name(class_="form-control")}}
                                     <ul class="invalid-feedback">
-                                        {% for d in form_d.name.errors%}
+                                        {% for d in forms.category.delete.name.errors%}
                                         <li class="form-control invalid">
                                             <p>{{e}}
                                         </li>
                                         {%endfor%}
                                     </ul>
                                 {% else%}
-                                    {{form_d.name(class_="form-control", style="display:none", value="delete")}}
+                                    {{forms.category.delete.name(class_="form-control", style="display:none", value="delete")}}
                                 {%endif%}
 
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                              {{form_d.submit(class_="btn btn-primary profile-button")}}
+                              {{forms.category.delete.submit(class_="btn btn-primary profile-button")}}
                             </div>
                           </form>
                         </div>
@@ -133,24 +133,24 @@
 
             {% endif%}
           <form action="{{url_for('adminPanel.add_category')}}" method="post">
-              {{form_a.hidden_tag()}}
+              {{forms.category.add.hidden_tag()}}
                <p>
-                {%if form_a.name.errors%}
-                    {{form_a.name(class_="form-control")}}
+                {%if forms.category.add.name.errors%}
+                    {{forms.category.add.name(class_="form-control")}}
                     <ul class="invalid-feedback">
-                        {% for e in form_a.name.errors%}
+                        {% for e in forms.category.add.name.errors%}
                         <li class="form-control invalid">
                             <p>{{e}}
                         </li>
                         {%endfor%}
                     </ul>
                 {% else%}
-                    {{form_a.name(class_="form-control", placeholder=form_a.name.description)}}
+                    {{forms.category.add.name(class_="form-control", placeholder=forms.category.add.name.description)}}
                 {%endif%}
 
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-              {{form_a.submit(class_="btn btn-primary profile-button")}}
+              {{forms.category.add.submit(class_="btn btn-primary profile-button")}}
             </div>
           </form>
         </div>

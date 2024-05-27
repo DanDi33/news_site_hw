@@ -1,7 +1,8 @@
 import os
 
 import flask
-from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response, send_from_directory, g
+from flask import (Blueprint, render_template, request, redirect, url_for, flash, make_response,
+                   send_from_directory, session)
 from flask_login import login_required, current_user, logout_user
 from werkzeug.utils import secure_filename
 
@@ -10,7 +11,7 @@ from adminpanel.useful.forms import (EditUsernameForm,
                                      EditPasswordForm,
                                      EditCategoryForm,
                                      DeleteCategoryForm,
-                                     AddPostForm)
+                                     AddPostForm, EditPostForm, DeletePostForm)
 from connect_db import db
 from models import User, Category, Post
 
@@ -23,21 +24,20 @@ menu = [
     {"name": "Профиль", "url": "adminPanel.profile"},
 ]
 
-last_form = dict()
-
 
 @admin.route("/")
 @admin.route("/profile")
 @login_required
 def profile():
-    form = AddPostForm()
-    add_category_choices(form)
-    form_u = EditUsernameForm()
-    form_e = EditEmailForm()
-    form_p = EditPasswordForm()
-    l_form = return_last_form()
-    return render_template("adminPanel/profile.html",
-                           menu=menu, form=form, form_u=form_u, form_e=form_e, form_p=form_p,
+    forms = {'post': {'add': AddPostForm(),
+                      'edit': {'username': EditUsernameForm(),
+                               'email': EditEmailForm(),
+                               'password': EditPasswordForm()}}}
+    add_category_choices(forms['post']['add'])
+
+    l_form = {}
+
+    return render_template("adminPanel/profile.html", menu=menu, forms=forms,
                            l_form=l_form, title='Авторизация')
 
 
@@ -125,17 +125,18 @@ def delete_profile():
 @admin.route("/category")
 @login_required
 def category():
-    form = AddPostForm()
-    add_category_choices(form)
-    form_a = EditCategoryForm()
-    form_e = EditCategoryForm()
-    form_d = DeleteCategoryForm()
-    l_form = return_last_form()
+    forms = {'post': {'add': AddPostForm()},
+             'category': {'add': EditCategoryForm(),
+                          'edit': EditCategoryForm(),
+                          'delete': DeleteCategoryForm()}}
+    add_category_choices(forms['post']['add'])
+
+    l_form = {}
     categories = Category.query.all()
-    # print(categories)
+
     open_modal_add_cat = request.cookies.get('open_modal_add_cat')
-    resp = make_response(render_template("adminPanel/category.html", menu=menu, form=form, form_a=form_a,
-                                         form_e=form_e, form_d=form_d, l_form=l_form, categories=categories,
+    resp = make_response(render_template("adminPanel/category.html", menu=menu, forms=forms,
+                                         l_form=l_form, categories=categories,
                                          open_modal_add_cat=open_modal_add_cat, title='Категории'))
     resp.delete_cookie('open_modal_add_cat')
     return resp
@@ -167,8 +168,8 @@ def add_category():
 @login_required
 def edit_category(alias):
     print(alias)
+    form_e = EditCategoryForm()
     if request.method == "POST":
-        form_e = EditCategoryForm()
         if form_e.validate_on_submit() and Category.query.filter_by(name=form_e.name.data).first() is None:
             try:
                 edit_cat = Category.query.filter_by(id=alias).first()
@@ -176,7 +177,7 @@ def edit_category(alias):
                 print(f"edit_cat- {edit_cat.name}")
                 db.session.add(edit_cat)
                 db.session.commit()
-                flash("Категория успешно добавлена", "success")
+                flash("Категория успешно изменена", "success")
             except:
                 db.session.rollback()
                 print("Ошибка добавления в бд")
@@ -191,12 +192,12 @@ def edit_category(alias):
 @admin.route("/delete_category/<alias>", methods=["GET", "POST"])
 @login_required
 def delete_category(alias):
+    form_d = DeleteCategoryForm()
+    delete_cat = Category.query.filter_by(id=alias).first()
     if request.method == "POST":
-        form_d = DeleteCategoryForm()
         if (form_d.validate_on_submit() and form_d.name.data == "delete"
                 and Post.query.filter_by(category_id=alias).first() is None):
             try:
-                delete_cat = Category.query.filter_by(id=alias).first()
                 db.session.delete(delete_cat)
                 db.session.commit()
                 flash("Категория успешно удалена", "success")
@@ -205,8 +206,8 @@ def delete_category(alias):
                 print("Ошибка удаления категории из бд")
                 flash("Ошибка удаления категории из бд", category="error")
         else:
-            print(f"Категория '{form_d.name.data}' не удалена из БД. Есть связанные посты")
-            flash(f"Категория '{form_d.name.data}' не удалена из БД. Есть связанные посты", category="error")
+            print(f"Категория '{delete_cat.name}' не удалена из БД. Есть связанные посты")
+            flash(f"Категория '{delete_cat.name}' не удалена из БД. Есть связанные посты", category="error")
 
     return redirect(url_for('adminPanel.category'))
 
@@ -220,50 +221,30 @@ def send_file(filename):
 @admin.route("/show_post")
 @login_required
 def show_post():
-    form = AddPostForm()
-    add_category_choices(form)
-    l_form = return_last_form()
-    posts = Post.query.filter_by(user_id=current_user.id).join(Category).add_columns(Post.title, Post.desc,
+    forms = {'post': {'add': AddPostForm(),
+                      'delete': DeletePostForm()}}
+    add_category_choices(forms['post']['add'])
+
+    l_form = {}
+
+    posts = Post.query.filter_by(user_id=current_user.id).join(Category).add_columns(Post.id, Post.title, Post.desc,
                                                                                      Post.filename, Category.name)
-    open_modal_add_post = request.cookies.get('open_modal_add_post')
-    # print(f'hasattr - {hasattr(g, "last_form")}')
+    if session.get('form_data'):
+        l_form = session.pop('form_data')
 
-    resp = make_response(
-        render_template("adminPanel/post.html", menu=menu, form=form, posts=posts,
-                        open_modal_add_post=open_modal_add_post,
-                        l_form=l_form, title='Мои посты'))
-    resp.delete_cookie('open_modal_add_post')
-
-    print(f'last form - {last_form}')
-    print(posts)
     [print(post) for post in posts]
-    return resp
+
+    return render_template("adminPanel/post.html", menu=menu, forms=forms, posts=posts,
+                           l_form=l_form, title='Мои посты')
 
 
 @admin.route("/add_post", methods=["GET", "POST"])
 @login_required
 def add_post():
+    form = AddPostForm()
+    add_category_choices(form)
     if request.method == "POST":
-        form = AddPostForm()
-        add_category_choices(form)
-
-        if len(form.category.choices) == 1:
-            resp = redirect(url_for('adminPanel.category'))
-            resp.set_cookie('open_modal_add_cat', 'True')
-            flash("Создайте категорию для добавления поста.", category="error")
-            return resp
-        print(f"form validate - {form.validate_on_submit()}")
-        if form.validate_on_submit():
-            if not form.category.data:
-                resp = redirect(url_for('adminPanel.show_post'))
-                resp.set_cookie('open_modal_add_post', 'True')
-
-                global last_form
-                last_form = {'title': form.title.data, 'image': form.image.data, 'description': form.description.data,
-                             'text': form.text.data}
-
-                flash("Вы не выбрали категорию. Пост не сохранен в БД.", category="error")
-                return resp
+        if form.validate_on_submit() and form.category.data:
             try:
                 add_post_to_db = Post(title=form.title.data,
                                       category_id=form.category.data,
@@ -272,31 +253,96 @@ def add_post():
                                       user_id=current_user.id
                                       )
 
-                db.session.add(add_post_to_db)
-                db.session.commit()
+                if form.image.data:
+                    add_post_to_db.filename = upload_image(form.image.data, add_post_to_db.id)
 
                 flash("Пост успешно добавлен", "success")
-                if form.image.data:
-                    image = form.image.data
+                db.session.add(add_post_to_db)
+                db.session.commit()
+            except:
+                db.session.rollback()
+                print("Ошибка добавления в бд")
+                flash("Ошибка добавления в бд", category="error")
+        else:
+            if len(form.category.choices) == 1:
+                resp = redirect(url_for('adminPanel.category'))
+                resp.set_cookie('open_modal_add_cat', 'True')
+                flash("Создайте категорию для добавления поста.", category="error")
+                return resp
 
-                    # Создаю имя файла вида: "image_p"+"post.id" + ".расширение исходного файла"
-                    last_part = image.filename.split('.')[-1]
-                    filename = secure_filename(f"image_p{add_post_to_db.id}.{last_part}")
+            if not form.category.data:
+                session['form_data'] = request.form.to_dict()
+                flash("Вы не выбрали категорию. Пост не сохранен в БД.", category="error")
+                return redirect(url_for('adminPanel.show_post'))
 
-                    # Создаю директорию "uploads", если ее нет
-                    os.makedirs(flask.current_app.config['UPLOAD_FOLDER'], exist_ok=True)
+            session['form_data'] = request.form.to_dict()
+            flash("Проверьте поля", category="error")
 
-                    # Сохраняю файл с новым именем в директории "uploads"
-                    image.save(os.path.join(flask.current_app.config['UPLOAD_FOLDER'], filename))
+    return redirect(url_for('adminPanel.show_post'))
 
-                    add_post_to_db.filename = filename
-                    db.session.add(add_post_to_db)
-                    db.session.commit()
+
+@admin.route("/edit_post/<alias>", methods=["GET", "POST"])
+@login_required
+def edit_post(alias):
+    l_form = {}
+    forms = {'post': {'add': AddPostForm(),
+                      'edit': EditPostForm()}}
+
+    forms["post"]["edit"].edit_category.choices = [("", "Выберите категорию")]
+    forms["post"]["edit"].edit_category.choices += ([(option.id, option.name) for option in Category.query.all()])
+
+    current_post = (Post.query.filter_by(id=alias).join(Category).
+                    add_columns(Post.id, Post.title, Post.desc, Post.filename,
+                                Post.post, Post.category_id, Category.name).first())
+
+    if request.method == "POST":
+        if forms["post"]["edit"].validate_on_submit() and forms["post"]["edit"].edit_category.data:
+            try:
+                edit_post_to_db = Post.query.filter_by(id=alias).first()
+                edit_post_to_db.title = forms["post"]["edit"].edit_title.data
+                edit_post_to_db.desc = forms["post"]["edit"].edit_description.data
+                edit_post_to_db.post = forms["post"]["edit"].edit_text.data
+                edit_post_to_db.user_id = current_user.id
+                edit_post_to_db.category_id = forms["post"]["edit"].edit_category.data
+
+                if forms["post"]["edit"].edit_image.data:
+                    edit_post_to_db.filename = upload_image(forms["post"]["edit"].edit_image.data, edit_post_to_db.id)
+
+                db.session.add(edit_post_to_db)
+                db.session.commit()
+                flash("Пост успешно изменен", "success")
+                return redirect(url_for('adminPanel.show_post'))
+
             except:
                 db.session.rollback()
                 print("Ошибка добавления в бд")
                 flash("Ошибка добавления в бд", category="error")
 
+        else:
+            if not forms["post"]["edit"].edit_category.data:
+                flash("Вы не выбрали категорию. Пост не сохранен в БД.", category="error")
+                return redirect(url_for(f'adminPanel.edit_post', alias=current_post.id))
+
+            flash("Проверьте поля", category="error")
+
+    return render_template('adminPanel/edit_post.html', menu=menu, forms=forms, l_form=l_form,
+                           current_post=current_post, title='Редактирование поста')
+
+
+@admin.route("/delete_post/<alias>", methods=["GET", "POST"])
+@login_required
+def delete_post(alias):
+    form = DeletePostForm()
+    deleted_post = Post.query.filter_by(id=alias).first()
+    if form.validate_on_submit() and form.name.data == "delete":
+        try:
+            db.session.delete(deleted_post)
+            db.session.commit()
+            flash("Пост успешно удален", "success")
+        except:
+            db.session.rollback()
+            print("Ошибка удаления категории из бд")
+            flash("Ошибка удаления поста из бд", category="error")
     return redirect(url_for('adminPanel.show_post'))
 
 
@@ -305,11 +351,15 @@ def add_category_choices(form):
     form.category.choices += ([(option.id, option.name) for option in Category.query.all()])
 
 
-def return_last_form():
-    global last_form
-    l_form = dict()
-    print(f'last form - {last_form}')
-    if last_form:
-        l_form = last_form
-        last_form = {}
-    return l_form
+def upload_image(image, post_id):
+
+    # Создаю имя файла вида: "image_p"+"post.id" + ".расширение исходного файла"
+    last_part = image.filename.split('.')[-1]
+    filename = secure_filename(f"image_p{post_id}.{last_part}")
+
+    # Создаю директорию "uploads", если ее нет
+    os.makedirs(flask.current_app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+    # Сохраняю файл с новым именем в директории "uploads"
+    image.save(os.path.join(flask.current_app.config['UPLOAD_FOLDER'], filename))
+    return filename

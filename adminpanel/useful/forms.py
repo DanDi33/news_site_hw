@@ -66,6 +66,32 @@ class AddPostForm(FlaskForm):
     submit = SubmitField("Добавить пост")
 
 
+class EditPostForm(FlaskForm):
+    edit_title = StringField("Заголовок",
+                             validators=[Length(min=2, max=300, message="Имя должно содержать от 2 до 300 символов"),
+                                         DataRequired()],
+                             description="Введите заголовок")
+    edit_category = SelectField("Категория")
+    edit_image = FileField('Картинка новости', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')],
+                           description="Выберете файл")
+    edit_description = TextAreaField("Краткое описание новости",
+                                     validators=[
+                                         Length(min=2, max=500, message="Имя должно содержать от 2 до 500 символов"),
+                                         DataRequired()],
+                                     description="Краткое описание новости")
+    edit_text = TextAreaField("Текст новости",
+                              validators=[Length(min=10, max=10000, message="Поле 'текст' должно содержать "
+                                                                            "от 10 символов"),
+                                          DataRequired()],
+                              description="Введите текст новости")
+    submit = SubmitField("Сохранить изменения")
+
+
+class DeletePostForm(FlaskForm):
+    name = StringField("Вы уверены что хотите удалить пост?")
+    submit = SubmitField("Да, удалить")
+
+
 class EditCategoryForm(FlaskForm):
     name = StringField("Категория", validators=[Length(min=4, max=25, message="Название категории должно содержать от 4"
                                                                               "до 25 символов"), ],

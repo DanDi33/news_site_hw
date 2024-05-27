@@ -69,24 +69,24 @@
         </div>
         <div class="modal-body">
           <form action="{{url_for('adminPanel.edit_username')}}" method="post">
-              {{form_u.hidden_tag()}}
-              <p>{{form_u.name.label(class_="form-label")}}
-                {%if form_u.name.errors%}
-                    {{form_u.name(class_="form-control")}}
+              {{forms.post.edit.username.hidden_tag()}}
+              <p>{{forms.post.edit.username.name.label(class_="form-label")}}
+                {%if forms.post.edit.username.name.errors%}
+                    {{forms.post.edit.username.name(class_="form-control")}}
                     <ul class="invalid-feedback">
-                        {% for e in form_u.name.errors%}
+                        {% for e in forms.post.edit.username.name.errors%}
                         <li class="form-control invalid">
                             <p>{{e}}
                         </li>
                         {%endfor%}
                     </ul>
                 {% else%}
-                    {{form_u.name(class_="form-control",value_=current_user.username)}}
+                    {{forms.post.edit.username.name(class_="form-control",value_=current_user.username)}}
                 {%endif%}
 
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-              {{form_u.submit(class_="btn btn-primary profile-button")}}
+              {{forms.post.edit.username.submit(class_="btn btn-primary profile-button")}}
             </div>
           </form>
         </div>
@@ -105,24 +105,24 @@
         </div>
         <div class="modal-body">
           <form action="{{url_for('adminPanel.edit_email')}}" method="post">
-              {{form_e.hidden_tag()}}
-              <p>{{form_e.email.label(class_="form-label")}}
-                {%if form_e.email.errors%}
-                    {{form_e.email(class_="form-control")}}
+              {{forms.post.edit.email.hidden_tag()}}
+              <p>{{forms.post.edit.email.email.label(class_="form-label")}}
+                {%if forms.post.edit.email.email.errors%}
+                    {{forms.post.edit.email.email(class_="form-control")}}
                     <ul class="invalid-feedback">
-                        {% for e in form_e.email.errors%}
+                        {% for e in forms.post.edit.email.email.errors%}
                         <li class="form-control invalid">
                             <p>{{e}}
                         </li>
                         {%endfor%}
                     </ul>
                 {% else%}
-                    {{form_e.email(class_="form-control",value_=current_user.email)}}
+                    {{forms.post.edit.email.email(class_="form-control",value_=current_user.email)}}
                 {%endif%}
 
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-              {{form_e.submit(class_="btn btn-primary profile-button")}}
+              {{forms.post.edit.email.submit(class_="btn btn-primary profile-button")}}
             </div>
           </form>
         </div>
@@ -142,8 +142,8 @@
         </div>
         <div class="modal-body">
           <form action="{{url_for('adminPanel.edit_password')}}" method="post">
-              {{form_p.hidden_tag()}}
-              {%for field in form_p if field.name not in ["csrf_token","submit"]%}
+              {{forms.post.edit.password.hidden_tag()}}
+              {%for field in forms.post.edit.password if field.name not in ["csrf_token","submit"]%}
                   <p>{{field.label(class_="form-label")}}
                     {%if field.errors%}
                         {{field(class_="form-control")}}
@@ -161,7 +161,7 @@
 
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-              {{form_p.submit(class_="btn btn-primary profile-button")}}
+              {{forms.post.edit.password.submit(class_="btn btn-primary profile-button")}}
             </div>
           </form>
         </div>
@@ -181,7 +181,7 @@
         </div>
         <div class="modal-body">
           <form action="{{url_for('adminPanel.delete_profile')}}" method="post">
-              {{form_e.hidden_tag()}}
+              {{ csrf_token }}
                 <div class="mb-3">
                   <label for="RegisterPassword" class="form-label">Введите пароль</label>
                   <input type="password" class="form-control" id="RegisterPassword" name="psw" required>
