@@ -39,24 +39,27 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
-    posts = Post.query.join(Category).join(User).add_columns(User.username,
+    posts = Post.query.join(Category).join(User).add_columns(Post.id,
                                                              Post.title,
                                                              Post.desc,
                                                              Post.filename,
                                                              Post.date,
-                                                             Category.name)
+                                                             Category.name,
+                                                             User.username
+                                                             )
     return render_template("index.html", posts=posts, title="Главная")
 
 
 @app.route("/show_post/<alias>", methods=["GET", "POST"])
 def show_post(alias):
-    post = Post.query.filter_by(id=alias).join(Category).join(User).add_columns(User.username,
+    post = Post.query.filter_by(id=alias).join(Category).join(User).add_columns(Post.id,
                                                                                 Post.title,
-
                                                                                 Post.post,
                                                                                 Post.date,
-                                                                                Category.name)
-    print(f"post - {post}")
+                                                                                Category.name,
+                                                                                User.username
+                                                                                ).first()
+
     return render_template('show_post.html', post=post, title="Пост")
 
 

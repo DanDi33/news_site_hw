@@ -18,9 +18,9 @@ from models import User, Category, Post
 admin = Blueprint('adminPanel', __name__, template_folder='templates', static_folder='static')
 
 menu = [
-    {"name": "Добавить пост", "url": "adminPanel.show_post"},
+    {"name": "Добавить пост", "url": "adminPanel.posts"},
     {"name": "Категории", "url": "adminPanel.category"},
-    {"name": "Посты", "url": "adminPanel.show_post"},
+    {"name": "Посты", "url": "adminPanel.posts"},
     {"name": "Профиль", "url": "adminPanel.profile"},
 ]
 
@@ -218,9 +218,9 @@ def send_file(filename):
     return send_from_directory(flask.current_app.config['UPLOAD_FOLDER'], filename)
 
 
-@admin.route("/show_post")
+@admin.route("/posts")
 @login_required
-def show_post():
+def posts():
     forms = {'post': {'add': AddPostForm(),
                       'delete': DeletePostForm()}}
     add_category_choices(forms['post']['add'])
@@ -273,12 +273,12 @@ def add_post():
             if not form.category.data:
                 session['form_data'] = request.form.to_dict()
                 flash("Вы не выбрали категорию. Пост не сохранен в БД.", category="error")
-                return redirect(url_for('adminPanel.show_post'))
+                return redirect(url_for('adminPanel.posts'))
 
             session['form_data'] = request.form.to_dict()
             flash("Проверьте поля", category="error")
 
-    return redirect(url_for('adminPanel.show_post'))
+    return redirect(url_for('adminPanel.posts'))
 
 
 @admin.route("/edit_post/<alias>", methods=["GET", "POST"])
@@ -311,7 +311,7 @@ def edit_post(alias):
                 db.session.add(edit_post_to_db)
                 db.session.commit()
                 flash("Пост успешно изменен", "success")
-                return redirect(url_for('adminPanel.show_post'))
+                return redirect(url_for('adminPanel.posts'))
 
             except:
                 db.session.rollback()
@@ -343,7 +343,7 @@ def delete_post(alias):
             db.session.rollback()
             print("Ошибка удаления категории из бд")
             flash("Ошибка удаления поста из бд", category="error")
-    return redirect(url_for('adminPanel.show_post'))
+    return redirect(url_for('adminPanel.posts'))
 
 
 def add_category_choices(form):

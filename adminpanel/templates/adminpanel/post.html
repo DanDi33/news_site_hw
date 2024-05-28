@@ -42,6 +42,7 @@
     <div class="row justify-content-center">
       <div class="col-md-10">
         {% for post in posts %}
+        <a href="{{url_for('show_post', alias=post.id)}}" style="text-decoration: none;color: #666;">
         <div class="card news-card">
           {% if post.filename%}
             <img src="{{url_for('adminPanel.send_file', filename=post.filename)}}" class="card-img-top" alt="...">
@@ -108,7 +109,7 @@
             </div>
           </div>
         </div>
-
+        </a>
         {% endfor %}
       </div>
     </div>
