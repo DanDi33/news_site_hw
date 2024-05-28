@@ -334,15 +334,19 @@ def edit_post(alias):
 def delete_post(alias):
     form = DeletePostForm()
     deleted_post = Post.query.filter_by(id=alias).first()
-    if form.validate_on_submit() and form.name.data == "delete":
-        try:
-            db.session.delete(deleted_post)
-            db.session.commit()
-            flash("Пост успешно удален", "success")
-        except:
-            db.session.rollback()
-            print("Ошибка удаления категории из бд")
-            flash("Ошибка удаления поста из бд", category="error")
+    if request.method == "POST":
+        if form.validate_on_submit() and form.name.data == "delete":
+            try:
+                db.session.delete(deleted_post)
+                db.session.commit()
+                flash("Пост успешно удален", "success")
+            except:
+                db.session.rollback()
+                print("Ошибка удаления категории из бд")
+                flash("Ошибка удаления поста из бд", category="error")
+        else:
+            print(f"Пост не удален из БД.")
+            flash(f"Пост не удален из БД.", category="error")
     return redirect(url_for('adminPanel.posts'))
 
 

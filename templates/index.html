@@ -6,32 +6,52 @@
   <!-- Sidebar (Фильтр) -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-brand">Фильтр</div>
-    <form>
-      <div class="mb-3">
-        <select class="form-select" aria-label="Select Category">
-          <option selected>Все категории</option>
-          <option value="1">Технологии</option>
-          <option value="2">Кулинария</option>
-          <option value="3">Фильмы</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <select class="form-select" aria-label="Select Time">
-          <option selected>Все время</option>
-          <option value="1">Сегодня</option>
-          <option value="2">Последняя неделя</option>
-          <option value="3">Последний месяц</option>
-        </select>
-      </div>
-      <div class="d-grid gap-2 mb-5">
-        <button class="btn btn-primary" type="button">Применить</button>
-        <button class="btn btn-secondary" type="button">Сбросить</button>
-      </div>
-    </form>
+    <form action="" method="post">
+            {{form.hidden_tag()}}
+
+              <div class="mb-3">
+                {{form.category(class_="form-select")}}
+              </div>
+
+                <div class="mb-3">
+                {{form.period(class_="form-select")}}
+              </div>
+
+            <div class="d-grid gap-2 mb-5">
+                {{form.submit(class_="btn btn-primary")}}
+                <button class="btn btn-secondary" type="button" onclick="location.href='{{url_for('.index')}}'">Сбросить</button>
+
+            </div>
+        </form>
+<!--    <form>-->
+<!--      <div class="mb-3">-->
+<!--        <select class="form-select" aria-label="Select Category">-->
+<!--          <option selected>Все категории</option>-->
+<!--          <option value="1">Технологии</option>-->
+<!--          <option value="2">Кулинария</option>-->
+<!--          <option value="3">Фильмы</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--      <div class="mb-3">-->
+<!--        <select class="form-select" aria-label="Select Time">-->
+<!--          <option selected>Все время</option>-->
+<!--          <option value="1">Сегодня</option>-->
+<!--          <option value="2">Последняя неделя</option>-->
+<!--          <option value="3">Последний месяц</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--      <div class="d-grid gap-2 mb-5">-->
+<!--        <button class="btn btn-primary" type="button">Применить</button>-->
+<!--        <button class="btn btn-secondary" type="button">Сбросить</button>-->
+<!--      </div>-->
+<!--    </form>-->
   </div>
 
   <!-- News Container -->
   <div class="news-container">
+      {% for cat,msg in get_flashed_messages(True) %}
+        <div class="flash {{cat}}">{{msg}}</div>
+    {% endfor %}
     <!-- News Cards -->
     <div class="row justify-content-center">
       <div class="col-md-10">

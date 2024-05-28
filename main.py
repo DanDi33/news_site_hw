@@ -1,13 +1,17 @@
+import datetime
 import locale
 
 import flask
-from flask import Flask, render_template, make_response, request, send_from_directory
-from flask_login import current_user
+from flask import Flask, render_template, make_response, request, send_from_directory, flash
+from sqlalchemy import or_
+
+# from flask_login import current_user
 
 from connect_db import db, login
 from models import User, Category, Post
 from authorize.login import user
 from adminpanel.admin import admin
+from useful.forms import FilterForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///news_site.db'
@@ -37,8 +41,21 @@ def load_user(user_id):
 #     db.create_all()
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
+    form = FilterForm()
+    form.category.choices = [("", "Все категории")]
+    form.category.choices += ([(option.id, option.name) for option in Category.query.all()])
+    last_day = datetime.datetime.now() - datetime.timedelta(days=1)
+    print(f'last_day - {last_day}')
+    last_week = datetime.datetime.now() - datetime.timedelta(weeks=1)
+    print(f'last_week - {last_week}')
+    last_month = datetime.datetime.now() - datetime.timedelta(days=30)
+    print(f'last_month - {last_month}')
+    form.period.choices = [("", "Всё время"),
+                           (last_day, "Сегодня"),
+                           (last_week, "Последняя неделя"),
+                           (last_month, "Последний месяц")]
     posts = Post.query.join(Category).join(User).add_columns(Post.id,
                                                              Post.title,
                                                              Post.desc,
@@ -47,10 +64,29 @@ def index():
                                                              Category.name,
                                                              User.username
                                                              )
-    return render_template("index.html", posts=posts, title="Главная")
+
+    if request.method == "POST":
+        if form.validate_on_submit():
+            posts = (Post.query.
+                     join(Category).join(User).add_columns(Post.id,
+                                                           Post.title,
+                                                           Post.desc,
+                                                           Post.filename,
+                                                           Post.date,
+                                                           Category.name,
+                                                           User.username
+                                                           )).filter(
+                or_(form.category.data == "", Post.category_id == form.category.data),
+                or_(form.period.data == "", Post.date >= form.period.data))
+        else:
+            flash(f"Ошибка валидации", category="error")
+    [print(post) for post in posts]
+    print(f'period.choices - {form.period.choices}')
+    print(f'form.validate_on_submit() - {form.validate_on_submit()}')
+    return render_template("index.html", form=form, posts=posts, title="Главная")
 
 
-@app.route("/show_post/<alias>", methods=["GET", "POST"])
+@app.route("/show_post/<alias>")
 def show_post(alias):
     post = Post.query.filter_by(id=alias).join(Category).join(User).add_columns(Post.id,
                                                                                 Post.title,
