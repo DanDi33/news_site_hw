@@ -1,9 +1,11 @@
+import datetime
 import os
 
 import flask
 from flask import (Blueprint, render_template, request, redirect, url_for, flash, make_response,
                    send_from_directory, session)
 from flask_login import login_required, current_user, logout_user
+from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
 from adminpanel.useful.forms import (EditUsernameForm,
@@ -11,7 +13,7 @@ from adminpanel.useful.forms import (EditUsernameForm,
                                      EditPasswordForm,
                                      EditCategoryForm,
                                      DeleteCategoryForm,
-                                     AddPostForm, EditPostForm, DeletePostForm)
+                                     AddPostForm, EditPostForm, DeletePostForm, FilterForm)
 from connect_db import db
 from models import User, Category, Post
 
@@ -218,19 +220,58 @@ def send_file(filename):
     return send_from_directory(flask.current_app.config['UPLOAD_FOLDER'], filename)
 
 
-@admin.route("/posts")
+@admin.route("/posts", methods=["GET", "POST"])
 @login_required
 def posts():
     forms = {'post': {'add': AddPostForm(),
-                      'delete': DeletePostForm()}}
+                      'delete': DeletePostForm()},
+             'filter': FilterForm()}
     add_category_choices(forms['post']['add'])
+    forms['filter'].category.choices = [("", "Все категории")]
+    forms['filter'].category.choices += ([(option.id, option.name) for option in Category.query.all()])
+
+    forms['filter'].period.choices = [("", "Всё время"),
+                                      ("1", "Сегодня"),
+                                      ("2", "Последняя неделя"),
+                                      ("3", "Последний месяц")]
 
     l_form = {}
 
-    posts = Post.query.filter_by(user_id=current_user.id).join(Category).add_columns(Post.id, Post.title, Post.desc,
-                                                                                     Post.filename, Category.name)
+    posts = Post.query.filter_by(user_id=current_user.id).join(Category).add_columns(Post.id,
+                                                                                     Post.title,
+                                                                                     Post.desc,
+                                                                                     Post.date,
+                                                                                     Post.filename,
+                                                                                     Category.name)
     if session.get('form_data'):
         l_form = session.pop('form_data')
+
+    if request.method == "POST":
+        if forms['filter'].validate_on_submit():
+            if forms['filter'].period.data == "1":
+                period = datetime.datetime.now() - datetime.timedelta(days=1)
+            elif forms['filter'].period.data == "2":
+                period = datetime.datetime.now() - datetime.timedelta(weeks=1)
+            elif forms['filter'].period.data == "3":
+                period = datetime.datetime.now() - datetime.timedelta(days=30)
+            else:
+                period = ""
+            posts = (Post.query.
+                     join(Category).join(User).add_columns(Post.id,
+                                                           Post.title,
+                                                           Post.desc,
+                                                           Post.filename,
+                                                           Post.date,
+                                                           Post.user_id,
+                                                           Category.name,
+                                                           User.username
+                                                           )).filter(
+                or_(Post.user_id == current_user.id),
+                or_(forms['filter'].category.data == "", Post.category_id == forms['filter'].category.data),
+                or_(forms['filter'].period.data == "", Post.date >= period))
+
+        else:
+            flash(f"Ошибка валидации", category="error")
 
     [print(post) for post in posts]
 
@@ -356,7 +397,6 @@ def add_category_choices(form):
 
 
 def upload_image(image, post_id):
-
     # Создаю имя файла вида: "image_p"+"post.id" + ".расширение исходного файла"
     last_part = image.filename.split('.')[-1]
     filename = secure_filename(f"image_p{post_id}.{last_part}")

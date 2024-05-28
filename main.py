@@ -44,18 +44,15 @@ def load_user(user_id):
 @app.route("/", methods=["GET", "POST"])
 def index():
     form = FilterForm()
+
     form.category.choices = [("", "Все категории")]
     form.category.choices += ([(option.id, option.name) for option in Category.query.all()])
-    last_day = datetime.datetime.now() - datetime.timedelta(days=1)
-    print(f'last_day - {last_day}')
-    last_week = datetime.datetime.now() - datetime.timedelta(weeks=1)
-    print(f'last_week - {last_week}')
-    last_month = datetime.datetime.now() - datetime.timedelta(days=30)
-    print(f'last_month - {last_month}')
+
     form.period.choices = [("", "Всё время"),
-                           (last_day, "Сегодня"),
-                           (last_week, "Последняя неделя"),
-                           (last_month, "Последний месяц")]
+                           ("1", "Сегодня"),
+                           ("2", "Последняя неделя"),
+                           ("3", "Последний месяц")]
+
     posts = Post.query.join(Category).join(User).add_columns(Post.id,
                                                              Post.title,
                                                              Post.desc,
@@ -67,6 +64,14 @@ def index():
 
     if request.method == "POST":
         if form.validate_on_submit():
+            if form.period.data == "1":
+                period = datetime.datetime.now() - datetime.timedelta(days=1)
+            elif form.period.data == "2":
+                period = datetime.datetime.now() - datetime.timedelta(weeks=1)
+            elif form.period.data == "3":
+                period = datetime.datetime.now() - datetime.timedelta(days=30)
+            else:
+                period = ""
             posts = (Post.query.
                      join(Category).join(User).add_columns(Post.id,
                                                            Post.title,
@@ -77,12 +82,11 @@ def index():
                                                            User.username
                                                            )).filter(
                 or_(form.category.data == "", Post.category_id == form.category.data),
-                or_(form.period.data == "", Post.date >= form.period.data))
+                or_(form.period.data == "", Post.date >= period))
+
         else:
             flash(f"Ошибка валидации", category="error")
-    [print(post) for post in posts]
-    print(f'period.choices - {form.period.choices}')
-    print(f'form.validate_on_submit() - {form.validate_on_submit()}')
+
     return render_template("index.html", form=form, posts=posts, title="Главная")
 
 

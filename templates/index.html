@@ -20,31 +20,8 @@
             <div class="d-grid gap-2 mb-5">
                 {{form.submit(class_="btn btn-primary")}}
                 <button class="btn btn-secondary" type="button" onclick="location.href='{{url_for('.index')}}'">Сбросить</button>
-
             </div>
         </form>
-<!--    <form>-->
-<!--      <div class="mb-3">-->
-<!--        <select class="form-select" aria-label="Select Category">-->
-<!--          <option selected>Все категории</option>-->
-<!--          <option value="1">Технологии</option>-->
-<!--          <option value="2">Кулинария</option>-->
-<!--          <option value="3">Фильмы</option>-->
-<!--        </select>-->
-<!--      </div>-->
-<!--      <div class="mb-3">-->
-<!--        <select class="form-select" aria-label="Select Time">-->
-<!--          <option selected>Все время</option>-->
-<!--          <option value="1">Сегодня</option>-->
-<!--          <option value="2">Последняя неделя</option>-->
-<!--          <option value="3">Последний месяц</option>-->
-<!--        </select>-->
-<!--      </div>-->
-<!--      <div class="d-grid gap-2 mb-5">-->
-<!--        <button class="btn btn-primary" type="button">Применить</button>-->
-<!--        <button class="btn btn-secondary" type="button">Сбросить</button>-->
-<!--      </div>-->
-<!--    </form>-->
   </div>
 
   <!-- News Container -->
@@ -68,7 +45,7 @@
             <h5 class="card-title">{{post.title}}</h5>
             <p class="card-text">{{post.desc}}</p>
             <p class="card-text d-flex">
-                <small class="text-muted me-auto ">Категория: {{post.name}}</small>
+                <small class="text-muted me-auto">Категория: {{post.name}}</small>
                 <small class="text-muted">Автор: {{post.username}}, {{post.date|formatdatetime('%d %B %Y, %H:%M')}}</small>
 
             </p>

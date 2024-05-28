@@ -105,3 +105,9 @@ class DeleteCategoryForm(FlaskForm):
                                                                  "до 25 символов"), ],
                        description="Введите категорию")
     submit = SubmitField("Да, удалить")
+
+
+class FilterForm(FlaskForm):
+    period = SelectField("Период")
+    category = SelectField("Категория")
+    submit = SubmitField("Применить")
